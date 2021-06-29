@@ -48,6 +48,7 @@ void ft_show_number(t_number *num)
 {
     printf("value %d index %d\n", num->number, num->index);
 }
+
 int     main(int  argc, char **argv)
 {
     t_env anb;

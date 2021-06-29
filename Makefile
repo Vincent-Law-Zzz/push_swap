@@ -6,7 +6,7 @@
 #    By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/11/08 20:18:18 by aapollo           #+#    #+#              #
-#    Updated: 2021/04/29 10:29:24 by aapollo          ###   ########.fr        #
+#    Updated: 2021/06/29 23:32:22 by aapollo          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ debug: CFLAGS += -fsanitize=address -g
 debug: all;
 
 $(NAME) :${OBJS}
-		${CC} ${CFLAGS} ${OBJS} -lft -L ./libft/ -o ${NAME}
+		${CC} ${CFLAGS} ${OBJS} -lft ./libft/libft.a -L ./libft/ -o ${NAME}
 
 clean:
 		rm -f ${OBJS}
