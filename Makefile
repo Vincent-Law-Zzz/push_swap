@@ -6,7 +6,7 @@
 #    By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/11/08 20:18:18 by aapollo           #+#    #+#              #
-#    Updated: 2021/06/29 23:32:22 by aapollo          ###   ########.fr        #
+#    Updated: 2021/07/02 19:21:18 by aapollo          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,14 +18,17 @@ CC = gcc
 
 CFLAGS = -Wall -Wextra -Werror -I./libft/
 
-SRCS = 	push_swap.c 
+SRCS = 	push_swap.c ps_utils.c
 
 OBJS = ${SRCS:.c=.o}
 
 all: ${NAME}
 
 debug: CFLAGS += -fsanitize=address -g
-debug: all;
+debug: fclean all;
+
+dvs: CFLAGS += -g
+dvs: all;
 
 $(NAME) :${OBJS}
 		${CC} ${CFLAGS} ${OBJS} -lft ./libft/libft.a -L ./libft/ -o ${NAME}
