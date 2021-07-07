@@ -64,10 +64,7 @@ void	ft_groupelem(t_env *env, t_list *stack,t_group *new)
 	tmp = stack;
 	while (tmp->next)
 	{
-		if (((t_number *)tmp->content)->group->max == ((t_number *)tmp->next->content)->group->max)
-			((t_number *)tmp->content)->group = new;
-		else
-			break;
+		((t_number *)tmp->content)->group = new;
 		tmp = tmp->next;
 	}
 	// ((t_number *)tmp->content)->group = new;
@@ -75,45 +72,11 @@ void	ft_groupelem(t_env *env, t_list *stack,t_group *new)
 	// printf("max %d mid %d min %d\n",new->max, new->mid, new->min);
 }
 
-int	ft_shiftcount(t_env *env)
-{
-	t_list * lst;
-	int counter;
-	int flag;
-
-	lst = env->st_a;
-	flag = 1;
-	counter = 0;
-	// while (lst->next)
-	// {
-		while(lst->next && ((t_number *)lst->content)->group)
-			lst = lst->next;
-		while(lst->next && !((t_number *)lst->content)->group)
-		{
-			if (((t_number *)lst->next->content)->group && ((t_number *)lst->next->content)->index == env->nexti)
-				((t_number *)lst->next->content)->group = NULL;
-			lst = lst->next;
-		}
-		while(lst->next && ((t_number *)lst->content)->group)
-		{
-			counter++;
-			lst = lst->next;
-		}
-	// 	if (flag == 1)
-	// 		if (!((t_number *)lst->content)->group)
-	// 			flag = -1;
-	// 	if (flag == -1 && ((t_number *)lst->next->content)->group && ((t_number *)lst->next->content)->index == env->nexti)
-	// 		((t_number *)lst->next->content)->group = NULL;
-	// // 	if (flag == -1)
-	// 		if (((t_number *)lst->content)->group)
-	// 			flag = 0;
-	// 	if (flag == 0)
-	// 		counter++;
-	// 	lst = lst->next;
-	// }
-	// printf(" counter , %d\n", counter);
-	return counter;
-}
+// int	ft_pop(t_env *env)
+// {
+// 	while (((t_number *)(ft_lstlast(anb.st_a))->content)->group != NULL && anb.nexti > 1)
+// 			ft_rra(&anb);
+// }
 
 void	ft_atob(t_env *env)
 {
@@ -125,27 +88,20 @@ void	ft_atob(t_env *env)
 	i = 0;
 	tmp = (t_group *)((t_number *)((t_list *)env->st_a)->content)->group;
 	tmpn = (t_group *)((t_number *)((t_list *)env->st_a->next)->content)->group;
-	index = ((t_number *)env->st_a->content)->index;
-	// getchar();
-	while (i <= tmp->max && tmp == tmpn)
+	while (i <= (tmp->mid - tmp->min) && tmp == tmpn && tmp && tmpn)
 	{
-		if (index <= tmp->mid)
-		{
-			ft_pb(env);
-		}
-		else
-			ft_ra(env);
-		i++;
 		index = ((t_number *)env->st_a->content)->index;
 		tmp = (t_group *)((t_number *)((t_list *)env->st_a)->content)->group;
 		tmpn = (t_group *)((t_number *)((t_list *)env->st_a->next)->content)->group;
-	}
 		if (index <= tmp->mid)
 		{
 			ft_pb(env);
+			i++;
 		}
 		else
 			ft_ra(env);
+		
+	}
 }
 
 int		ft_calcmin(t_list *stack)
@@ -153,12 +109,12 @@ int		ft_calcmin(t_list *stack)
 	t_list *tmp;
 	int min;
 
-	min = ((t_group *)((t_number *)stack->content)->group)->max;
+	min = ((t_number *)stack->content)->index;
 	tmp = stack;
-	while(tmp->next)
+	while(tmp)
 	{
-		if (min > ((t_group *)((t_number *)tmp->content)->group)->min)
-			min = ((t_group *)((t_number *)tmp->content)->group)->min;
+		if (min > ((t_number *)tmp->content)->index)
+			min = ((t_number *)tmp->content)->index;
 		tmp = tmp->next;
 	}
 	// printf("min %d \n",min);
@@ -170,15 +126,15 @@ int		ft_calcmax(t_list *stack)
 	t_list *tmp;
 	int max;
 
-	max = ((t_group *)((t_number *)stack->content)->group)->min;
+	max = ((t_number *)stack->content)->index;
 	tmp = stack;
-	while(tmp->next)
+	while(tmp)
 	{
-		if (max < ((t_group *)((t_number *)tmp->content)->group)->max)
-			max = ((t_group *)((t_number *)tmp->content)->group)->max;
+		if (max < ((t_number *)tmp->content)->index)
+			max = ((t_number *)tmp->content)->index;
 		tmp = tmp->next;
 	}
-	// printf("max %d \n",max);
+	// printf("min %d \n",min);
 	return (max);
 }
 
@@ -191,6 +147,8 @@ void ft_addnewgroup(t_env __unused *env,t_list *stack)
 
 	tmp = stack;
 	g = ((t_number *)tmp->content)->group;
+	if(!g)
+		return ;
 	nextg = ((t_number *)tmp->next->content)->group;
 	min = g->mid;
 	while (((t_number *)tmp->content)->group != NULL && g == nextg)
@@ -216,100 +174,115 @@ void ft_sort(t_env *env, int index)
 		ft_ra(env);
 		env->nexti = env->nexti + 1;
 	}
-	else if (index < ((t_group *)((t_number *)env->st_b->content)->group)->mid)
+	else
 		ft_rb(env);
 }
 
 void	ft_btoa(t_env *env)
 {
 	t_group *tmp;
-	int index;
+	t_number *number;
 	int i;
 
 	i = 0;
 	if (!env->st_b)
 		return;
-	index = ((t_number *)env->st_b->content)->index;
+	number = ((t_number *)env->st_b->content);
 	tmp = ((t_number *)env->st_b->content)->group;
-	while (env->st_b->next)
+	while (env->st_b)
 	{
-		getchar();
-		ft_groupelem(env,env->st_b,ft_create_group(ft_calcmax(env->st_b), ft_calcmin(env->st_b)));
-		printf("___________max %d min %d__________\n", ft_calcmax(env->st_b),ft_calcmin(env->st_b));
-		tmp = ((t_number *)env->st_b->content)->group;
+		tmp = ft_create_group(ft_calcmax(env->st_b), ft_calcmin(env->st_b));
+		ft_lstadd_back_content(&env->group,tmp);
+		// printf("___________max %d min %d__________\n", ft_calcmax(env->st_b),ft_calcmin(env->st_b));
 		i = 1;
-		while (i <= tmp->mid && env->st_b->next)
+		int count = ft_lstsize(env->st_b);
+		while ( count-- && env->st_b)
 		{
+			number = ((t_number *)env->st_b->content);
 			// printf("index min %d i %d\n", ((t_group *)((t_number *)env->st_b->content)->group)->min, i);
-			if (index >= tmp->mid)
+			if (number->index > tmp->mid)
 			{
+				number->group = tmp;
 				ft_pa(env);
 				i++;
 			}
-			else if (index <= tmp->mid)
-				ft_sort(env, index);
+			else if (number->index <= tmp->mid)
+				ft_sort(env, number->index);
 			else
 				break;
-			index = ((t_number *)env->st_b->content)->index;
-			printf("index st_a %d\n", index);
-			printf (" %d stack A\n", env->nexti);
-			ft_lstiter(env->st_a, (void (*)(void *))ft_show_number);
-			printf (" %d stack B\n", env->nexti);
-			ft_lstiter(env->st_b, (void (*)(void *))ft_show_number);
-			printf("index min %d i %d\n", ((t_group *)((t_number *)env->st_b->content)->group)->min, i);
-			getchar();
+			// printf("index st_a %d\n", index);
+			// printf (" %d stack A\n", env->nexti);
+			// ft_lstiter(env->st_a, (void (*)(void *))ft_show_number);
+			// printf (" %d stack B\n", env->nexti);
+			// ft_lstiter(env->st_b, (void (*)(void *))ft_show_number);
+			// printf("index min %d i %d\n", ((t_group *)((t_number *)env->st_b->content)->group)->min, i);
 		}
 	}
-	ft_sort(env, index);
+	// ft_sort(env, index);
 }
 
 
 void	ft_sort_top(t_env *env)
 {
-	if (((t_number *)(env->st_a->content))->index == env->nexti)
+	t_number *n;
+	t_number *nextn;
+
+	n = ((t_number *)(env->st_a->content));
+	nextn = ((t_number *)(env->st_a->next->content));
+	while (n && nextn && (n->index == env->nexti || nextn->index == env->nexti))
 	{
-		((t_number *)(env->st_a->content))->group = NULL;
-		env->nexti = env->nexti + 1; 
-		ft_ra(env);
-	}
-	if (((t_number *)(env->st_a->next->content))->index == env->nexti)
-	{
-		((t_number *)(env->st_a->next->content))->group = NULL;
-		env->nexti = env->nexti + 1;
-		ft_sa(env);
-		ft_ra(env);
+		n = ((t_number *)(env->st_a->content));
+		nextn = ((t_number *)(env->st_a->next->content));
+		if (n->index == env->nexti)
+		{
+			((t_number *)(env->st_a->content))->group = NULL;
+			env->nexti = env->nexti + 1; 
+			ft_ra(env);
+			continue;
+		}
+		if (nextn && (nextn->index == env->nexti))
+		{
+			ft_sa(env);
+			((t_number *)(env->st_a->content))->group = NULL;
+			env->nexti = env->nexti + 1;
+			ft_ra(env);
+			continue;
+		}
 	}
 }
 
 int     main(int  argc, char **argv)
 {
     t_env anb;
-	int	i;
+	t_number *number;
 
     ft_bzero(&anb, sizeof(anb));
 	anb.nexti = 1;
     ft_makelems(&anb, argc, argv);
-	ft_atob(&anb);
-	i = 0;
+	number = (t_number *)(ft_lstlast(anb.st_a))->content;
 	while (anb.nexti < argc - 1)
 	{
-	
+		ft_atob(&anb);
+		ft_sort_top(&anb);
+		while (((t_number *)(ft_lstlast(anb.st_a))->content)->group != NULL && anb.nexti > 1)
+			ft_rra(&anb);
+		ft_sort_top(&anb);
 		// printf (" %d stack A\n", anb.nexti);
 		// ft_lstiter(anb.st_a, (void (*)(void *))ft_show_number);
 		// printf (" %d stack B\n", anb.nexti);
 		// ft_lstiter(anb.st_b, (void (*)(void *))ft_show_number);
-		// printf("index min %d i %d\n", ((t_group *)((t_number *)anb.st_a->content)->group)->max, i);
+		// printf("index min %d i\n", ((t_group *)((t_number *)anb.st_a->content)->group)->max);
 		ft_btoa(&anb);
 		ft_addnewgroup(&anb,anb.st_a);
 		ft_sort_top(&anb);
-		ft_atob(&anb);
-		i = ft_shiftcount(&anb);
-		while (((t_number *)(ft_lstlast(anb.st_a))->content)->group != NULL)
-			ft_rra(&anb);
-		ft_sort_top(&anb);
+		// ft_sort_top(&anb);
+		// ft_atob(&anb);
+		// i = ft_shiftcount(&anb);
+		
 	}
 	// printf("next i %d\n", anb.nexti);
 	// printf (" %d stack A\n", anb.nexti);
 	// ft_lstiter(anb.st_a, (void (*)(void *))ft_show_number);
+	return (0);
 }
 
