@@ -5,6 +5,7 @@ void	ft_content_free(void *content)
 {
 	if (content)
 	{
+		free(((t_number *)content)->group);
 		free(content);
 	}
 }
@@ -16,7 +17,7 @@ void ft_free(t_env * env)
 	if (env->st_b)
 		ft_lstclear(&env->st_a, ft_content_free);
 	if (env->group)
-		ft_lstclear(&env->group, ft_content_free);
+		ft_lstclear(&env->group, free);
 	free (env->st_a);
 	free (env->st_b);
 	free (env->group);
@@ -83,7 +84,7 @@ void	ft_pop(t_env *env)
 		if (((t_number *)lst->next->content)->group != NULL && ((t_number *)lst->next->content)->index == env->nexti)
 			((t_number *)lst->next->content)->group = NULL;
 		lst = lst->next;
-	}y
+	}
 	while (((t_number *)(ft_lstlast(env->st_a))->content)->group != NULL && env->nexti > 1)
 			ft_rra(env);
 }
@@ -209,7 +210,7 @@ int	ft_condition(t_env *env,t_list *tmp1, t_list *tmp2)
 {
 	if (tmp1 && ((t_number *)tmp1->content)->index == env->nexti)
 		return (1);
-	else if (tmp1->next && ((t_number *)tmp1->next->content)->index == env->nexti)
+	else if (tmp1 && tmp1->next && ((t_number *)tmp1->next->content)->index == env->nexti)
 		return (2);
 	else if (tmp2 && ((t_number *)tmp2->content)->index == env->nexti)
 		return (3);
@@ -409,7 +410,7 @@ int     main(int  argc, char **argv)
 	// printf (" %d stack A\n", anb.nexti);
 	// ft_lstiter(anb.st_a, (void (*)(void *))ft_show_number);
 	ft_free(&anb);
-	// getchar();
+	getchar();
 	return (0);
 }
 
