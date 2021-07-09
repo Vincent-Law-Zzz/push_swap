@@ -107,6 +107,8 @@ int	main(int argc, char **argv)
 {
 	t_env	anb;
 
+	if (!(argv[1]))
+		return (0);
 	ft_bzero(&anb, sizeof(anb));
 	anb.nexti = 1;
 	ft_validation(argv);
